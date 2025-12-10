@@ -1,4 +1,3 @@
-#include <any>
 #include <iostream>
 #include "raylib.h"
 #include <vector>
@@ -51,14 +50,22 @@ public:
 int main() {
     const int SCREEN_WIDTH = 1200;
     const int SCREEN_HEIGHT = 800;
+    int currentScene = 0;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Menu Interactive");
     InitAudioDevice();
     SetTargetFPS(60);
 
-    Music bgMusic = LoadMusicStream("Audio/bg_music.mp3");
+    Music baseSound = LoadMusicStream("Audio/baseSound.mp3");
+    Music mainAltSound = LoadMusicStream("Audio/mainAltSound.mp3");
+    Music settingsAltSound = LoadMusicStream("Audio/settingsAltSound.mp3");
     Sound sfxClick = LoadSound("Audio/Click.mp3");
-    PlayMusicStream(bgMusic);
+    PlayMusicStream(baseSound);
+    PlayMusicStream(mainAltSound);
+    PlayMusicStream(settingsAltSound);
+    SetMusicVolume(baseSound, 1.0f);
+    SetMusicVolume(mainAltSound, 0.0f);
+    SetMusicVolume(settingsAltSound, 0.0f);
 
 
     vector<Button> buttons;
@@ -78,30 +85,43 @@ int main() {
     bool isHoovered = false;
     float musicVolume = 1.0f;
     while(!WindowShouldClose()){
-        UpdateMusicStream(bgMusic);
+        UpdateMusicStream(baseSound);
+        UpdateMusicStream(mainAltSound);
+        UpdateMusicStream(settingsAltSound);
 
         bool anyHoovered = false;
 
         // drawing here
         BeginDrawing();
-        ClearBackground(BLACK);
+        float target;
+        switch (currentScene) {
+            case 0:
+                ClearBackground(BLACK);
 
-        for (int i = 0;i<buttons.size();i++){
-            isHoovered = buttons[i].WhenHoovered();
-            if (isHoovered) anyHoovered = true;
-            buttons[i].WhenClicked();
-            buttons[i].Draw();
+                for (int i = 0;i<buttons.size();i++){
+                    isHoovered = buttons[i].WhenHoovered();
+                    if (isHoovered) anyHoovered = true;
+                    buttons[i].WhenClicked();
+                    buttons[i].Draw();
+                }
+
+                target = anyHoovered ? 0.5f : 1.0f;
+                musicVolume += (target - musicVolume) * 0.1f;
+                SetMusicVolume(baseSound, musicVolume);
+                break;
+            case 1:
+                ClearBackground(WHITE);
+                break;
+            default:
+                ClearBackground(BLACK);
         }
 
-        float target = anyHoovered ? 0.5f : 1.0f;
-        musicVolume += (target - musicVolume) * 0.1f;
-        SetMusicVolume(bgMusic, musicVolume);
 
         EndDrawing();
     }
 
 
-    UnloadMusicStream(bgMusic);
+    UnloadMusicStream(baseSound);
     UnloadSound(sfxClick);
     CloseAudioDevice();
 
