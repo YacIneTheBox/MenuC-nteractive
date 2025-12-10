@@ -4,13 +4,15 @@
 
 using namespace std;
 
+Color buttonColorCountour = WHITE;
+Color buttonColorFill = BLACK;
+Color textColor = WHITE;
+
+
+void DrawingButtons(Rectangle cadre,string text);
 int main() {
     const int SCREEN_WIDTH = 1200;
     const int SCREEN_HEIGHT = 800;
-
-    Color buttonColorCountour = WHITE;
-    Color buttonColorFill = BLACK;
-    Color textColor = WHITE;
 
     vector<Rectangle> buttons;
     Rectangle MenuButton_Start = {SCREEN_WIDTH/(float)2 - 150, SCREEN_HEIGHT/(float)3 - 50, 300, 80};
@@ -32,16 +34,20 @@ int main() {
             }
         }
 
-
         // drawing here
         BeginDrawing();
         ClearBackground(BLACK);
-        DrawRectangle(MenuButton_Start.x, MenuButton_Start.y, MenuButton_Start.width, MenuButton_Start.height, buttonColorCountour);
-        DrawRectangle(MenuButton_Start.x+5, MenuButton_Start.y+5, MenuButton_Start.width-10, MenuButton_Start.height-10, buttonColorFill);
-        DrawText("Proceed", MenuButton_Start.x+60, MenuButton_Start.y+20, 40, textColor);
+
+        DrawingButtons(MenuButton_Start, "Proceed");
 
         EndDrawing();
     }
 
     return 0;
+}
+
+void DrawingButtons(Rectangle cadre,string text){
+    DrawRectangle(cadre.x, cadre.y, cadre.width, cadre.height, buttonColorCountour);
+    DrawRectangle(cadre.x+5, cadre.y+5, cadre.width-10, cadre.height-10, buttonColorFill);
+    DrawText(text.c_str(), cadre.x+60, cadre.y+20, 40, textColor);
 }
