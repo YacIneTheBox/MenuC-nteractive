@@ -12,9 +12,10 @@ public:
     Color colorFill;
     Color textColor;
     Sound sfxClick;
+    int scene;
 
-    Button(Rectangle rect, string txt, Color countour, Color fill, Color text,Sound sfx)
-        : rectangle(rect), text(txt), colorCountour(countour), colorFill(fill), textColor(text) ,sfxClick(sfx){}
+    Button(Rectangle rect, string txt, Color countour, Color fill, Color text,Sound sfx, int scene)
+        : rectangle(rect), text(txt), colorCountour(countour), colorFill(fill), textColor(text) ,sfxClick(sfx), scene(scene){}
 
     bool WhenHoovered(){
         if (CheckCollisionPointRec(GetMousePosition(),rectangle)){
@@ -28,13 +29,13 @@ public:
         }
     }
 
-    bool WhenClicked(){
+    int WhenClicked(){
         if (CheckCollisionPointRec(GetMousePosition(),rectangle)
             && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
             PlaySound(sfxClick);
-            return true;
+            return scene;
         }
-        return false;
+        return 0;
     }
 
 
@@ -64,21 +65,20 @@ int main() {
     PlayMusicStream(mainAltSound);
     PlayMusicStream(settingsAltSound);
     SetMusicVolume(baseSound, 1.0f);
-    SetMusicVolume(mainAltSound, 0.0f);
-    SetMusicVolume(settingsAltSound, 0.0f);
+
 
 
     vector<Button> buttons;
     Rectangle MenuButton_Start = {SCREEN_WIDTH/(float)2 - 150, SCREEN_HEIGHT/(float)3 - 50, 300, 80};
-    Button MenuButton_Start_Button(MenuButton_Start, "Proceed", WHITE, BLACK, WHITE,sfxClick);
+    Button MenuButton_Start_Button(MenuButton_Start, "Proceed", WHITE, BLACK, WHITE,sfxClick,1);
     buttons.push_back(MenuButton_Start_Button);
 
     Rectangle MenuButton_Settings = {SCREEN_WIDTH/(float)2 - 150, SCREEN_HEIGHT/(float)2 - 50, 300, 80};
-    Button MenuButton_Settings_Button(MenuButton_Settings,"Settings",WHITE,BLACK,WHITE,sfxClick);
+    Button MenuButton_Settings_Button(MenuButton_Settings,"Settings",WHITE,BLACK,WHITE,sfxClick,2);
     buttons.push_back(MenuButton_Settings_Button);
 
     Rectangle MenuButton_Exit = {SCREEN_WIDTH/(float)2 - 150, SCREEN_HEIGHT/(float)1.5f - 50, 300, 80};
-    Button MenuButton_Exit_Button(MenuButton_Exit,"Exit",WHITE,BLACK,WHITE,sfxClick);
+    Button MenuButton_Exit_Button(MenuButton_Exit,"Exit",WHITE,BLACK,WHITE,sfxClick,3);
     buttons.push_back(MenuButton_Exit_Button);
 
     bool isClicked = false;
@@ -91,29 +91,44 @@ int main() {
 
         bool anyHoovered = false;
 
+        if (IsKeyPressed(KEY_SPACE)){
+            currentScene = 0;
+        }
+
         // drawing here
         BeginDrawing();
         float target;
+        cout << "Current Scene: " << currentScene << endl;
         switch (currentScene) {
             case 0:
                 ClearBackground(BLACK);
-
+                SetMusicVolume(mainAltSound, 0.0f);
+                SetMusicVolume(settingsAltSound, 0.0f);
                 for (int i = 0;i<buttons.size();i++){
+                    buttons[i].Draw();
                     isHoovered = buttons[i].WhenHoovered();
                     if (isHoovered) anyHoovered = true;
-                    buttons[i].WhenClicked();
-                    buttons[i].Draw();
+                    currentScene = buttons[i].WhenClicked();
+                    if (currentScene != 0)break;
                 }
 
-                target = anyHoovered ? 0.5f : 1.0f;
+                target = anyHoovered ? 0.2f : 1.0f;
                 musicVolume += (target - musicVolume) * 0.1f;
                 SetMusicVolume(baseSound, musicVolume);
                 break;
             case 1:
                 ClearBackground(WHITE);
+                musicVolume += (1.0f - musicVolume) * 0.1f;
+                SetMusicVolume(mainAltSound, musicVolume);
+                SetMusicVolume(settingsAltSound, 0.0f);
+                break;
+            case 2:
+                ClearBackground(GREEN);
+                SetMusicVolume(mainAltSound, 0.0f);
+                SetMusicVolume(settingsAltSound, 1.0f);
                 break;
             default:
-                ClearBackground(BLACK);
+                ClearBackground(RED);
         }
 
 
@@ -122,6 +137,8 @@ int main() {
 
 
     UnloadMusicStream(baseSound);
+    UnloadMusicStream(mainAltSound);
+    UnloadMusicStream(settingsAltSound);
     UnloadSound(sfxClick);
     CloseAudioDevice();
 
