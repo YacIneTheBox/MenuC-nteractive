@@ -65,6 +65,7 @@ int main() {
     PlayMusicStream(mainAltSound);
     PlayMusicStream(settingsAltSound);
     SetMusicVolume(baseSound, 1.0f);
+    SetSoundVolume(sfxClick,0.7f);
 
 
 
@@ -83,7 +84,14 @@ int main() {
 
     bool isClicked = false;
     bool isHoovered = false;
-    float musicVolume = 1.0f;
+
+    float baseVol = 1.0f, baseTarget = 1.0f;
+    float mainVol = 0.0f, mainTarget = 0.0f;
+    float settingsVol = 0.0f, settingsTarget = 0.0f;
+
+    float fadeSpeed = 0.01f; // plus petit = plus lent
+
+
     while(!WindowShouldClose()){
         UpdateMusicStream(baseSound);
         UpdateMusicStream(mainAltSound);
@@ -102,8 +110,9 @@ int main() {
         switch (currentScene) {
             case 0:
                 ClearBackground(BLACK);
-                SetMusicVolume(mainAltSound, 0.0f);
-                SetMusicVolume(settingsAltSound, 0.0f);
+                baseTarget = 1.0f;
+                mainTarget = 0.0f;
+                settingsTarget = 0.0f;
                 for (int i = 0;i<buttons.size();i++){
                     buttons[i].Draw();
                     isHoovered = buttons[i].WhenHoovered();
@@ -111,25 +120,34 @@ int main() {
                     currentScene = buttons[i].WhenClicked();
                     if (currentScene != 0)break;
                 }
-
-                target = anyHoovered ? 0.2f : 1.0f;
-                musicVolume += (target - musicVolume) * 0.1f;
-                SetMusicVolume(baseSound, musicVolume);
                 break;
             case 1:
                 ClearBackground(WHITE);
-                musicVolume += (1.0f - musicVolume) * 0.1f;
-                SetMusicVolume(mainAltSound, musicVolume);
-                SetMusicVolume(settingsAltSound, 0.0f);
+                baseTarget = 1.0f;
+                mainTarget = 1.0f;
+                settingsTarget = 0.0f;
                 break;
             case 2:
                 ClearBackground(GREEN);
-                SetMusicVolume(mainAltSound, 0.0f);
-                SetMusicVolume(settingsAltSound, 1.0f);
+                baseTarget = 1.0f;
+                mainTarget = 0.0f;
+                settingsTarget = 1.0f;
                 break;
             default:
                 ClearBackground(RED);
         }
+
+        auto lerp = [](float current, float target, float speed) {
+            return current + (target - current) * speed;
+        };
+
+        baseVol     = lerp(baseVol,     baseTarget,     fadeSpeed);
+        mainVol     = lerp(mainVol,     mainTarget,     fadeSpeed);
+        settingsVol = lerp(settingsVol, settingsTarget, fadeSpeed);
+
+        SetMusicVolume(baseSound,     baseVol);
+        SetMusicVolume(mainAltSound,  mainVol);
+        SetMusicVolume(settingsAltSound, settingsVol);
 
 
         EndDrawing();
