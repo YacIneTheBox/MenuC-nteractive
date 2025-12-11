@@ -41,14 +41,14 @@ int main() {
                 SceneType next = menu.UpdateAndDraw();
                 if (next == SceneType::Main)      currentScene = SceneType::Main;
                 else if (next == SceneType::Settings) currentScene = SceneType::Settings;
-                else if (next == SceneType::Credits)  currentScene = SceneType::Credits;
+                else if (next == SceneType::Credits) currentScene = SceneType::Credits;
             } break;
 
             case SceneType::Main:
                 ClearBackground(WHITE);
                 break;
 
-            case SceneType::Settings:
+            case SceneType::Settings:²
                 ClearBackground(GREEN);
                 break;
 

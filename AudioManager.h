@@ -19,6 +19,8 @@ public:
     float mainVol = 0.0f, mainTarget = 0.0f;
     float settingsVol = 0.0f, settingsTarget = 0.0f;
 
+    float basePitch = 1.0f;
+
     float fadeSpeed = 0.025f; // plus petit = plus lent
 
     void Init() {
@@ -84,5 +86,11 @@ public:
         SetMusicVolume(baseSound,       baseVol);
         SetMusicVolume(mainAltSound,    mainVol);
         SetMusicVolume(settingsAltSound, settingsVol);
+    }
+
+    void SetHoverPitch(bool hovered){
+        float target = hovered ? 1.0f : 0.5f;
+        basePitch += (target - basePitch) * 0.1f;
+        SetMusicPitch(baseSound, target);
     }
 };
