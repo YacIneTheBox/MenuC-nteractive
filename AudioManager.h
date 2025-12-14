@@ -51,6 +51,7 @@ public:
                 baseTarget     = 1.0f;
                 mainTarget     = 0.0f;
                 settingsTarget = 0.0f;
+
                 break;
             case SceneType::Main:
                 baseTarget     = 1.0f;

@@ -48,7 +48,7 @@ int main() {
                 ClearBackground(WHITE);
                 break;
 
-            case SceneType::Settings:²
+            case SceneType::Settings:
                 ClearBackground(GREEN);
                 break;
 
